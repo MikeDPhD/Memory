@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Experiment</title>
+
+    <!-- Automatic redirect to Qualtrics after 10 seconds -->
+    <meta http-equiv="refresh" content="10;url=https://qualtricsxmmbnkxpcvm.qualtrics.com/jfe/form/SV_0xJXjTeTjFHVb14">
+
+    <style>
+        /* Styling for question stems */
+        .question-stem {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000; /* Darker color for stems */
+            margin-bottom: 10px;
+        }
+
+        /* Styling for answer options */
+        .answer-option {
+            font-size: 14px; /* Smaller font size for options */
+            color: #777; /* Lighter color for options */
+            margin-left: 10px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        input[type="radio"], input[type="text"] {
+            margin: 10px;
+        }
+        .question-box {
+            margin-bottom: 20px;
+            text-align: left; /* Align questions and answers to the left */
+            display: inline-block; /* Center the content block */
+        }
+        .error-message {
+            color: red;
+            display: none;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+        .answer-options {
+            margin-left: 20px; /* Add spacing to align answers better */
+        }
+    </style>
+</head>
+<body>
+    <div id="comprehensionPage">
+        <h1>Comprehension Questions</h1>
+        <div class="question-box">
+            <p class="question-stem">Should you use pen and paper to solve the task?</p>
+            <form id="comprehensionForm">
+                <label class="answer-option">
+                    <input type="radio" name="answer1" value="Yes"> Yes
+                </label><br>
+                <label class="answer-option">
+                    <input type="radio" name="answer1" value="No"> No
+                </label>
+            </form>
+        </div>
+
+        <div class="question-box">
+            <p class="question-stem">The Standard and Poor's 500 stock market index is worth USD 100 today and USD 120 in one year. What is the annual percentage change?</p>
+            <label class="answer-option">
+                Answer in %: <input type="text" name="percentageChange" id="percentageChange" placeholder="Enter your answer here">
+            </label>
+            <p id="percentageError" class="error-message">Incorrect answer. Please try again.</p>
+        </div>
+
+        <button type="button" id="comprehensionSubmitButton">Next</button>
+    </div>
+
+    <div id="mainTask" style="display: none;">
+        <h1>S&P 500 Animated Returns (2013-2023)</h1>
+        <button id="startButton">Start Experiment</button>
+        <div id="captchaContainer" style="display: none;">
+            <p class="question-stem">Please solve the CAPTCHA to start:</p>
+            <p class="question-stem">What is 3 + 4?</p>
+            <input type="text" id="captchaInput" placeholder="Enter your answer">
+            <button id="captchaSubmitButton">Submit</button>
+            <p id="captchaError" style="color: red; display: none;">Incorrect answer. Please try again.</p>
+        </div>
+        <canvas id="sp500Chart" style="display: none;"></canvas>
+    </div>
+
+    <div id="postExperimentPage" style="display: none;">
+        <h1>Post-experiment Questionnaire</h1>
+        <div class="question-box">
+            <p class="question-stem">
+                It is vital to our study that we only include responses from people that devoted their full attention to this study. 
+                Otherwise, your and the researcher's time may be wasted. This will not affect in any way the payment you will receive 
+                for taking this survey. Please tell us how much effort you put forth toward this study.
+            </p>
+            <form id="effortForm" class="answer-options">
+                <label class="answer-option">
+                    <input type="radio" name="effort" value="Almost no effort"> Almost no effort
+                </label><br>
+                <label class="answer-option">
+                    <input type="radio" name="effort" value="Very little effort"> Very little effort
+                </label><br>
+                <label class="answer-option">
+                    <input type="radio" name="effort" value="Some effort"> Some effort
+                </label><br>
+                <label class="answer-option">
+                    <input type="radio" name="effort" value="Quite a bit of effort"> Quite a bit of effort
+                </label><br>
+                <label class="answer-option">
+                    <input type="radio" name="effort" value="A lot of effort"> A lot of effort
+                </label>
+            </form>
+        </div>
+        <button id="submitPostExperiment">Submit</button>
+    </div>
+</body>
+</html>
