@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S&P 500 Index Percentage Price Changes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        canvas {
+            width: 800px !important;
+            height: 400px !important;
+            display: block;
+            margin: 0 auto;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        .input-field {
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        #input-container button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        #time-remaining {
+            font-size: 16px;
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainTask">
+        <h1>S&P 500 Index Percentage Price Changes</h1>
+        <button id="startButton">Start Experiment</button>
+        <canvas id="sp500Chart"></canvas>
+    </div>
+    <div id="memoryElicitation" style="display:none;">
+        <div class="container">
+            <h1>Enter Percentage Price Changes</h1>
+            <p id="instructions">
+                Enter percentage price changes below. Click "Enter" after each number. Once done, click "Done."
+            </p>
+            <p id="time-remaining">Time Remaining: 30 seconds</p>
+            <div id="input-container" class="input-field">
+                <input type="text" id="input-1" placeholder="Enter a percentage change">
+            </div>
+            <button id="enter-button">Enter</button>
+            <button id="done-button">Done</button>
+            <div id="output-container" class="input-field">
+                <p>Entries:</p>
+                <ul id="entries-list"></ul>
+            </div>
+            <p id="thankYouMessage" style="display:none; color: green; font-weight: bold;">Thank you! Your entries have been recorded.</p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script>
+        // Chart.js Configuration for Memory Experiment
+        const labels = ['-9', '-8', '-7', '-6', '-5', '-4', '-3', '-2', '-1', '0'];
+        const sp500Returns = [11.4, -0.7, 9.5, 19.4, -6.2, 28.9, 16.3, 26.9, -19.4, 17.0];
+
+        const ctx = document.getElementById("sp500Chart").getContext("2d");
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: "S&P 500 Returns (%)",
+                data: Array(labels.length).fill(null), // Start with completely empty data
+                backgroundColor: "blue"
+            }]
+        };
+
+        const config = {
+            type: "bar",
+            data: data,
+            plugins: [ChartDataLabels],
+            options: {
+                animation: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false },
+                    datalabels: {
+                        display: function(context) {
+                            return context.dataset.data[context.dataIndex] !== null; // Only show labels for non-null values
+                        },
+                        color: "black",
+                        font: { weight: "bold", size: 12 },
+                        anchor: "end",
+                        align: "top",
+                        formatter: (value) => value.toFixed(0) + "%"
+                    }
+                },
+                scales: {
+                    x: { title: { display: true, font: { weight: 'bold' }, text: "Year" } },
+                    y: { title: { display: true, font: { weight: 'bold' }, text: "Yearly Return in Percent (%)" }, min: -40, max: 40 }
+                }
+            }
+        };
+
+        const chart = new Chart(ctx, config);
+
+        let currentYearIndex = 0;
+
+        document.getElementById("startButton").addEventListener("click", function () {
+            updateChart();
+        });
+
+        function updateChart() {
+            if (currentYearIndex <= labels.length) {
+                chart.data.datasets[0].data.fill(null); // Keep all bars empty initially
+
+                if (currentYearIndex < labels.length) {
+                    chart.data.datasets[0].data[currentYearIndex] = sp500Returns[currentYearIndex];
+                }
+
+                chart.update();
+                currentYearIndex++;
+
+                if (currentYearIndex <= labels.length) {
+                    setTimeout(updateChart, 2000); // Show each bar every 2 seconds
+                } else {
+                    setTimeout(() => {
+                        transitionToMemoryElicitation();
+                    }, 2000);
+                }
+            }
+        }
+
+        // Transition to Memory Elicitation
+        function transitionToMemoryElicitation() {
+            document.getElementById("mainTask").style.display = "none";
+
+            setTimeout(() => {
+                document.getElementById("memoryElicitation").style.display = "block";
+                startTimer();
+            }, 10000); // 10-second pause
+        }
+
+        // Memory Elicitation JavaScript Logic
+        const inputContainer = document.getElementById('input-container');
+        const entriesList = document.getElementById('entries-list');
+        const enterButton = document.getElementById('enter-button');
+        const doneButton = document.getElementById('done-button');
+        const inputField = document.getElementById('input-1');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        const timeRemainingDisplay = document.getElementById('time-remaining');
+
+        let entryCount = 0;
+        const maxEntries = 10;
+        let timerInterval;
+
+        enterButton.addEventListener('click', handleEnterClick);
+        doneButton.addEventListener('click', finalizeInput);
+
+        function handleEnterClick() {
+            const value = inputField.value.trim();
+
+            if (!isNaN(value) && value !== '') {
+                entryCount++;
+                addEntryToList(value);
+
+                if (entryCount >= maxEntries) {
+                    finalizeInput();
+                }
+                inputField.value = ''; // Clear the input field
+            } else {
+                alert("Please enter a valid number.");
+            }
+        }
+
+        function addEntryToList(value) {
+            const listItem = document.createElement('li');
+            listItem.textContent = value + "%";
+            entriesList.appendChild(listItem);
+        }
+
+        function finalizeInput() {
+            clearInterval(timerInterval); // Stop the timer
+            alert("Thank you! Your entries have been recorded.");
+            disableInputs();
+            showThankYouMessage();
+        }
+
+        function disableInputs() {
+            inputField.disabled = true;
+            enterButton.disabled = true;
+            doneButton.disabled = true;
+        }
+
+        function showThankYouMessage() {
+            setTimeout(() => {
+                thankYouMessage.style.display = "block";
+            }, 1000); // Show after 1 second
+        }
+
+        // Timer Logic for Memory Elicitation
+        function startTimer() {
+            let timeRemaining = 30;
+            timeRemainingDisplay.textContent = `Time Remaining: ${timeRemaining} seconds`;
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                timeRemainingDisplay.textContent = `Time Remaining: ${timeRemaining} seconds`;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    finalizeInput();
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
