@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Input with Single Field</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+        }
+        .input-field {
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter Percentage Price Changes</h1>
+        <p id="instructions">
+            Enter percentage price changes below. Click "Enter" after each number. Once done, click "Done."
+        </p>
+        <div id="input-container" class="input-field">
+            <input type="text" id="input-1" placeholder="Enter a percentage change">
+        </div>
+        <button id="enter-button">Enter</button>
+        <button id="done-button">Done</button>
+        <div id="output-container" class="input-field">
+            <p>Entries:</p>
+            <ul id="entries-list"></ul>
+        </div>
+    </div>
+    <script>
+        // Set a 30-second timer
+        var timer = 30; // in seconds
+        var endTime = Date.now() + timer * 1000;
+
+        // Get references to HTML elements
+        var inputContainer = document.getElementById('input-container');
+        var entriesList = document.getElementById('entries-list');
+        var enterButton = document.getElementById('enter-button');
+        var doneButton = document.getElementById('done-button');
+        var inputField = document.getElementById('input-1');
+
+        var entryCount = 0;
+        var maxEntries = 10;
+
+        enterButton.addEventListener('click', handleEnterClick);
+        doneButton.addEventListener('click', finalizeInput);
+
+        function handleEnterClick() {
+            var value = inputField.value.trim();
+
+            // Validate input as a number
+            if (!isNaN(value) && value !== '') {
+                entryCount++;
+                addEntryToList(value);
+
+                if (entryCount >= maxEntries) {
+                    finalizeInput();
+                }
+                // Clear the input field
+                inputField.value = '';
+            } else {
+                alert("Please enter a valid number.");
+            }
+        }
+
+        function addEntryToList(value) {
+            var listItem = document.createElement('li');
+            listItem.textContent = value + "%";
+            entriesList.appendChild(listItem);
+        }
+
+        function finalizeInput() {
+            alert("Thank you! Your entries have been recorded.");
+            disableInputs();
+        }
+
+        function disableInputs() {
+            inputField.disabled = true;
+            enterButton.disabled = true;
+            doneButton.disabled = true;
+        }
+
+        // Automatically finalize after 30 seconds
+        setTimeout(finalizeInput, timer * 1000);
+    </script>
+</body>
+</html>
